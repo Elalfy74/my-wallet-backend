@@ -52,7 +52,28 @@ export class TransactionsService {
     ]);
   }
 
-  findAll() {
-    return `This action returns all transactions`;
+  findAll(session: ISession) {
+    return this.prisma.wallet.findUnique({
+      where: {
+        userId: session.userId,
+      },
+      select: {
+        name: true,
+        sentTransactions: {
+          select: {
+            amount: true,
+            receiverName: true,
+            createdAt: true,
+          },
+        },
+        receivedTransactions: {
+          select: {
+            amount: true,
+            senderName: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
   }
 }
