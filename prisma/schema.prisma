@@ -38,4 +38,23 @@ model Wallet {
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @unique
+
+  recivedTransactions Transaction[] @relation(name: "reciver")
+  sentTransactions    Transaction[] @relation(name: "sender")
+}
+
+model Transaction {
+  id String @id @default(uuid())
+
+  receiver     Wallet @relation(name: "reciver", fields: [receiverName], references: [name])
+  receiverName String
+
+  sender     Wallet @relation(name: "sender", fields: [senderName], references: [name])
+  senderName String
+
+  amount Decimal
+  note   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
