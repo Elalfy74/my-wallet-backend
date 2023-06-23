@@ -35,6 +35,7 @@ export const setup = (app: INestApplication) => {
   app.use(
     cookieSession({
       keys: [configService.get('SESSION_KEY')],
+      sameSite: 'none',
     }),
   );
 

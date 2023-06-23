@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dtos';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ISession } from 'src/auth/interfaces';
-import { Decimal } from '@prisma/client/runtime';
+import { Decimal } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class TransactionsService {
