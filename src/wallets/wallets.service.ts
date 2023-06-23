@@ -10,7 +10,7 @@ import {
 } from '@prisma/client/runtime/library';
 import { ISession } from 'src/auth/interfaces';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateWalletDto } from './dtos';
+import { CreateWalletDto, FindQueryDto } from './dtos';
 
 @Injectable()
 export class WalletsService {
@@ -27,8 +27,8 @@ export class WalletsService {
       if (e instanceof PrismaClientKnownRequestError) {
         if (e.code === 'P2002') {
           const msg =
-            e.meta?.target === 'name'
-              ? 'Name already used'
+            e.meta?.target[0] === 'name'
+              ? 'Wallet Name is already taken'
               : 'User Already has a wallet';
           throw new ForbiddenException(msg);
         }
@@ -46,10 +46,32 @@ export class WalletsService {
         userId: session.userId,
       },
     });
-    const formattedBalance = new Decimal(wallet.balance.toString()).toNumber();
 
     if (!wallet) throw new NotFoundException('No Wallet found');
 
+    const formattedBalance = new Decimal(wallet.balance.toString()).toNumber();
+
     return { ...wallet, balance: formattedBalance };
+  }
+
+  find(query: FindQueryDto) {
+    return this.prisma.wallet.findMany({
+      where: {
+        name: {
+          contains: query.search,
+        },
+      },
+      select: {
+        name: true,
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            avatar: true,
+          },
+        },
+      },
+      take: 4,
+    });
   }
 }

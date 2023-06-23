@@ -1,7 +1,7 @@
 import { IsString, Length } from 'class-validator';
 
-export class CreateWalletDto {
+export class FindQueryDto {
   @IsString()
-  @Length(5, 15)
-  name: string;
+  @Length(2, 50)
+  search: string;
 }

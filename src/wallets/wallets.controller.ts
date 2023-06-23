@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Session,
   UseGuards,
 } from '@nestjs/common';
@@ -10,12 +11,11 @@ import { WalletsService } from './wallets.service';
 import { ISession } from 'src/auth/interfaces';
 import { AuthGuard } from 'src/guards';
 import { ApiTags } from '@nestjs/swagger';
-import { CreateWalletDto, WalletDto } from './dtos';
+import { CreateWalletDto, FindQueryDto, WalletDto } from './dtos';
 import { Serialize } from 'src/interceptors';
 
 @Controller('wallets')
 @UseGuards(AuthGuard)
-@Serialize(WalletDto)
 @ApiTags('Wallets')
 export class WalletsController {
   constructor(private readonly walletsService: WalletsService) {}
@@ -28,8 +28,14 @@ export class WalletsController {
     return 'Wallet Created Successfully';
   }
 
-  @Get()
+  @Get('/one')
+  @Serialize(WalletDto)
   findOne(@Session() session: ISession) {
     return this.walletsService.findOne(session);
+  }
+
+  @Get()
+  find(@Query() query: FindQueryDto) {
+    return this.walletsService.find(query);
   }
 }
