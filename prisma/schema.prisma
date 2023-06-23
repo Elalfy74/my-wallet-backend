@@ -31,7 +31,8 @@ model User {
 }
 
 model Wallet {
-  id String @id @default(uuid())
+  id   String @id @default(uuid())
+  name String @unique
 
   balance Decimal @default(0)
 
