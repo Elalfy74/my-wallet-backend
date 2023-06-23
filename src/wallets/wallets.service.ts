@@ -54,11 +54,18 @@ export class WalletsService {
     return { ...wallet, balance: formattedBalance };
   }
 
-  find(query: FindQueryDto) {
+  find(query: FindQueryDto, session: ISession) {
     return this.prisma.wallet.findMany({
       where: {
         name: {
           contains: query.search,
+        },
+        AND: {
+          userId: {
+            not: {
+              equals: session.userId,
+            },
+          },
         },
       },
       select: {

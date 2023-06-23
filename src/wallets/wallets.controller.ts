@@ -35,7 +35,7 @@ export class WalletsController {
   }
 
   @Get()
-  find(@Query() query: FindQueryDto) {
-    return this.walletsService.find(query);
+  find(@Query() query: FindQueryDto, @Session() session: ISession) {
+    return this.walletsService.find(query, session);
   }
 }
