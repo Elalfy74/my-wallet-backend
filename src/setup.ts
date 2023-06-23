@@ -32,5 +32,12 @@ export const setup = (app: INestApplication) => {
     }),
   );
 
+  const frontEndUrl: string = configService.get('FRONTEND_URL');
+
+  app.enableCors({
+    origin: [...frontEndUrl.split(' ')],
+    credentials: true,
+  });
+
   return (configService.get('PORT') || 3000) as number;
 };

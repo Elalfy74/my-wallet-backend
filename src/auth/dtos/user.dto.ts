@@ -6,7 +6,4 @@ export class UserDto {
 
   @Expose()
   lastName: string;
-
-  @Expose()
-  email: string;
 }

@@ -1,13 +1,6 @@
 import { IsEmail, IsInt, IsString, Length, Max, Min } from 'class-validator';
 
 export class RegisterDto {
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  @Length(6, 225)
-  password: string;
-
   @IsString()
   @Length(2, 50)
   firstName: string;
@@ -15,6 +8,13 @@ export class RegisterDto {
   @IsString()
   @Length(2, 50)
   lastName: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  @Length(6, 225)
+  password: string;
 
   @IsInt()
   @Min(10000000000000, {

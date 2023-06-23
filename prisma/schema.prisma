@@ -21,4 +21,21 @@ model User {
 
   nationalId BigInt @unique
   phone      Int    @unique
+
+  avatar String @default("https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-859.jpg?w=826&t=st=1687479895~exp=1687480495~hmac=b997a0bf41e821121c722d2921667f3f8c1e7a292f663b1a84e9fe0df934e27e")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  walletId String? @unique
+  Wallet   Wallet?
+}
+
+model Wallet {
+  id String @id @default(uuid())
+
+  balance Decimal @default(0)
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @unique
 }
