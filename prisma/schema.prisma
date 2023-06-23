@@ -27,8 +27,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  walletId String? @unique
-  Wallet   Wallet?
+  Wallet Wallet?
 }
 
 model Wallet {
