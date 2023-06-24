@@ -58,8 +58,6 @@ export class WalletsService {
     const q = { name: { contains: query.search, mode: 'insensitive' } };
     const filter = query.search ? q : {};
 
-    console.log(filter);
-
     return this.prisma.wallet.findMany({
       where: {
         ...filter,

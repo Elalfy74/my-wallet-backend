@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto, UserDto } from './dtos';
@@ -29,7 +29,11 @@ export class AuthController {
   ) {
     const savedUser = await this.authService.register(registerDto);
 
-    response.cookie('token', savedUser.accessToken);
+    response.cookie('token', savedUser.accessToken, {
+      sameSite: 'none',
+      secure: true,
+      httpOnly: true,
+    });
 
     return savedUser.user;
   }
@@ -55,7 +59,6 @@ export class AuthController {
 
   @Get('checkauth')
   @UseGuards(JwtGuard)
-  @ApiBearerAuth()
   getMe(@GetUser() user: { userId: string; email: string }) {
     return user;
   }
