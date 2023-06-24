@@ -1,7 +1,8 @@
-import { IsString, Length } from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class FindQueryDto {
   @IsString()
-  @Length(2, 50)
+  @MaxLength(50)
+  @IsOptional()
   search: string;
 }

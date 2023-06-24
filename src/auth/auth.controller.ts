@@ -4,16 +4,17 @@ import {
   Get,
   HttpCode,
   Post,
-  Session,
+  Res,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
-import { ISession } from './interfaces';
 import { LoginDto, RegisterDto, UserDto } from './dtos';
 import { Serialize } from 'src/interceptors';
-import { AuthGuard } from 'src/guards';
+import { JwtGuard } from 'src/guards';
+import { GetUser } from './decrators/get-user.decorator';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -23,38 +24,39 @@ export class AuthController {
 
   @Post('register')
   async register(
+    @Res({ passthrough: true }) response: Response,
     @Body() registerDto: RegisterDto,
-    @Session() session: ISession,
   ) {
     const savedUser = await this.authService.register(registerDto);
 
-    session.userId = savedUser.id;
-    session.email = savedUser.email;
+    response.cookie('token', savedUser.accessToken);
 
-    return savedUser;
+    return savedUser.user;
   }
 
   @Post('login')
   @HttpCode(200)
-  async login(@Body() loginDto: LoginDto, @Session() session: ISession) {
+  async login(
+    @Res({ passthrough: true }) response: Response,
+    @Body() loginDto: LoginDto,
+  ) {
     const user = await this.authService.login(loginDto);
 
-    session.userId = user.id;
-    session.email = user.email;
+    response.cookie('token', user.accessToken);
 
-    return user;
+    return user.user;
   }
 
   @Post('logout')
   @HttpCode(200)
-  logout(@Session() session: ISession) {
-    session.userId = null;
-    session.email = null;
+  logout(@Res({ passthrough: true }) response: Response) {
+    response.cookie('token', null);
   }
 
   @Get('checkauth')
-  @UseGuards(AuthGuard)
-  getMe(@Session() session: ISession) {
-    return session;
+  @UseGuards(JwtGuard)
+  @ApiBearerAuth()
+  getMe(@GetUser() user: { userId: string; email: string }) {
+    return user;
   }
 }

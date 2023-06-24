@@ -1,41 +1,34 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Post,
-  Query,
-  Session,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { WalletsService } from './wallets.service';
 import { ISession } from 'src/auth/interfaces';
-import { AuthGuard } from 'src/guards';
+import { JwtGuard } from 'src/guards';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateWalletDto, FindQueryDto, WalletDto } from './dtos';
 import { Serialize } from 'src/interceptors';
+import { GetUser } from 'src/auth/decrators/get-user.decorator';
 
 @Controller('wallets')
-@UseGuards(AuthGuard)
+@UseGuards(JwtGuard)
 @ApiTags('Wallets')
 export class WalletsController {
   constructor(private readonly walletsService: WalletsService) {}
   @Post()
   async create(
     @Body() createWalletDto: CreateWalletDto,
-    @Session() session: ISession,
+    @GetUser() user: ISession,
   ) {
-    await this.walletsService.create(createWalletDto, session);
+    await this.walletsService.create(createWalletDto, user);
     return 'Wallet Created Successfully';
   }
 
   @Get('/one')
   @Serialize(WalletDto)
-  findOne(@Session() session: ISession) {
-    return this.walletsService.findOne(session);
+  findOne(@GetUser() user: ISession) {
+    return this.walletsService.findOne(user);
   }
 
   @Get()
-  find(@Query() query: FindQueryDto, @Session() session: ISession) {
-    return this.walletsService.find(query, session);
+  find(@Query() query: FindQueryDto, @GetUser() user: ISession) {
+    return this.walletsService.find(query, user);
   }
 }

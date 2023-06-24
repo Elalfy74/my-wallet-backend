@@ -55,11 +55,15 @@ export class WalletsService {
   }
 
   find(query: FindQueryDto, session: ISession) {
+    const q = { name: { contains: query.search, mode: 'insensitive' } };
+    const filter = query.search ? q : {};
+
+    console.log(filter);
+
     return this.prisma.wallet.findMany({
       where: {
-        name: {
-          contains: query.search,
-        },
+        ...filter,
+
         AND: {
           userId: {
             not: {

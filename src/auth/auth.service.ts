@@ -8,10 +8,16 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LoginDto, RegisterDto } from './dtos';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwt: JwtService,
+    private config: ConfigService,
+  ) {}
 
   async register(registerDto: RegisterDto) {
     const { password } = registerDto;
@@ -19,9 +25,19 @@ export class AuthService {
     try {
       registerDto.password = await hash(password, 12);
 
-      return await this.prisma.user.create({
+      const user = await this.prisma.user.create({
         data: registerDto,
       });
+
+      const accessToken = await this.signToken({
+        userId: user.id,
+        email: user.email,
+      });
+
+      return {
+        accessToken,
+        user,
+      };
     } catch (e) {
       if (e instanceof PrismaClientKnownRequestError) {
         if (e.code === 'P2002') {
@@ -47,6 +63,22 @@ export class AuthService {
     const isEqual = await compare(hash, user.password);
     if (!isEqual) throw new UnauthorizedException('Invalid Email or Password');
 
-    return user;
+    const accessToken = await this.signToken({
+      userId: user.id,
+      email: user.email,
+    });
+
+    return {
+      accessToken,
+      user,
+    };
+  }
+
+  private async signToken(payload: { userId: string; email: string }) {
+    const secret = this.config.get('JWT_SECRET');
+
+    return this.jwt.signAsync(payload, {
+      secret,
+    });
   }
 }

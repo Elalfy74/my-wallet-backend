@@ -8,12 +8,13 @@ import {
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dtos';
-import { AuthGuard } from 'src/guards';
+import { JwtGuard } from 'src/guards';
 import { ISession } from 'src/auth/interfaces';
 import { ApiTags } from '@nestjs/swagger';
+import { GetUser } from 'src/auth/decrators/get-user.decorator';
 
 @Controller('transactions')
-@UseGuards(AuthGuard)
+@UseGuards(JwtGuard)
 @ApiTags('Transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
@@ -21,13 +22,13 @@ export class TransactionsController {
   @Post()
   async create(
     @Body() createTransactionDto: CreateTransactionDto,
-    @Session() session: ISession,
+    @GetUser() user: ISession,
   ) {
-    await this.transactionsService.create(createTransactionDto, session);
+    await this.transactionsService.create(createTransactionDto, user);
   }
 
   @Get()
-  findAll(@Session() Session: ISession) {
-    return this.transactionsService.findAll(Session);
+  findAll(@GetUser() user: ISession) {
+    return this.transactionsService.findAll(user);
   }
 }
