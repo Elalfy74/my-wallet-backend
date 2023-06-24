@@ -46,7 +46,11 @@ export class AuthController {
   ) {
     const user = await this.authService.login(loginDto);
 
-    response.cookie('token', user.accessToken);
+    response.cookie('token', user.accessToken, {
+      sameSite: 'none',
+      secure: true,
+      httpOnly: true,
+    });
 
     return user.user;
   }
@@ -54,7 +58,11 @@ export class AuthController {
   @Post('logout')
   @HttpCode(200)
   logout(@Res({ passthrough: true }) response: Response) {
-    response.cookie('token', null);
+    response.cookie('token', null, {
+      sameSite: 'none',
+      secure: true,
+      httpOnly: true,
+    });
   }
 
   @Get('checkauth')
