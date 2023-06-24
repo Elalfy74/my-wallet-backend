@@ -64,6 +64,7 @@ export class TransactionsService {
             amount: true,
             receiverName: true,
             createdAt: true,
+            note: true,
           },
         },
         receivedTransactions: {
@@ -71,6 +72,7 @@ export class TransactionsService {
             amount: true,
             senderName: true,
             createdAt: true,
+            note: true,
           },
         },
       },
