@@ -13,15 +13,18 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   handleRequest(err, user, info, context: ExecutionContext) {
-    const req = context.switchToHttp().getRequest();
-    const res = context.switchToHttp().getResponse();
-
-    const { refreshToken } = req.cookies;
-
+    if (user) {
+      return user;
+    }
     // Check for error
     if (err) {
       throw err || new UnauthorizedException();
     }
+
+    const req = context.switchToHttp().getRequest();
+    const res = context.switchToHttp().getResponse();
+
+    const { refreshToken } = req.cookies;
 
     // In case of expiration, reissue AccessToken
     if (refreshToken && info && info.message === 'jwt expired') {
