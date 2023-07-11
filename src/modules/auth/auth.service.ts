@@ -6,17 +6,16 @@ import {
 import { compare, hash } from 'bcryptjs';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/global/modules/prisma/prisma.service';
+import { TokenService } from 'src/global/modules/token/token.service';
+
 import { LoginDto, RegisterDto } from './dtos';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
-    private jwt: JwtService,
-    private config: ConfigService,
+    private tokenService: TokenService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -29,13 +28,25 @@ export class AuthService {
         data: registerDto,
       });
 
-      const accessToken = await this.signToken({
-        userId: user.id,
-        email: user.email,
-      });
+      const accessToken = this.tokenService.signToken(
+        {
+          userId: user.id,
+          email: user.email,
+        },
+        'access',
+      );
+
+      const refreshToken = this.tokenService.signToken(
+        {
+          userId: user.id,
+          email: user.email,
+        },
+        'refresh',
+      );
 
       return {
         accessToken,
+        refreshToken,
         user,
       };
     } catch (e) {
@@ -63,22 +74,26 @@ export class AuthService {
     const isEqual = await compare(hash, user.password);
     if (!isEqual) throw new UnauthorizedException('Invalid Email or Password');
 
-    const accessToken = await this.signToken({
-      userId: user.id,
-      email: user.email,
-    });
+    const accessToken = this.tokenService.signToken(
+      {
+        userId: user.id,
+        email: user.email,
+      },
+      'access',
+    );
+
+    const refreshToken = this.tokenService.signToken(
+      {
+        userId: user.id,
+        email: user.email,
+      },
+      'refresh',
+    );
 
     return {
       accessToken,
+      refreshToken,
       user,
     };
-  }
-
-  private async signToken(payload: { userId: string; email: string }) {
-    const secret = this.config.get('JWT_SECRET');
-
-    return this.jwt.signAsync(payload, {
-      secret,
-    });
   }
 }

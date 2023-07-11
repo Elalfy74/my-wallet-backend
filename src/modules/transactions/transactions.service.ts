@@ -1,8 +1,10 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { CreateTransactionDto } from './dtos';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { ISession } from 'src/auth/interfaces';
 import { Decimal } from '@prisma/client/runtime/library';
+
+import { PrismaService } from 'src/global/modules/prisma/prisma.service';
+import { ISession } from 'src/global/interfaces';
+
+import { CreateTransactionDto } from './dtos';
 
 @Injectable()
 export class TransactionsService {

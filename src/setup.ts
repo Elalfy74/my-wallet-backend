@@ -37,6 +37,7 @@ export const setup = (app: INestApplication) => {
   app.enableCors({
     origin: [...frontEndUrl.split(' ')],
     credentials: true,
+    exposedHeaders: ['x-access-token'],
   });
 
   return (configService.get('PORT') || 3000) as number;

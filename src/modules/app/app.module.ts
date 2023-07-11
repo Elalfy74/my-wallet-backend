@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-import { PrismaModule } from './prisma/prisma.module';
-import { AuthModule } from './auth/auth.module';
+import { PrismaModule } from 'src/global/modules/prisma/prisma.module';
+import { TokenModule } from 'src/global/modules/token/token.module';
+
+import { AuthModule } from '../auth/auth.module';
+import { WalletsModule } from '../wallets/wallets.module';
+import { TransactionsModule } from '../transactions/transactions.module';
+
 import { AppController } from './app.controller';
-import { WalletsModule } from './wallets/wallets.module';
-import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -13,6 +16,7 @@ import { TransactionsModule } from './transactions/transactions.module';
       isGlobal: true,
     }),
     PrismaModule,
+    TokenModule,
     AuthModule,
     WalletsModule,
     TransactionsModule,

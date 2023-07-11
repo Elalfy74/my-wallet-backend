@@ -8,8 +8,10 @@ import {
   Decimal,
   PrismaClientKnownRequestError,
 } from '@prisma/client/runtime/library';
-import { ISession } from 'src/auth/interfaces';
-import { PrismaService } from 'src/prisma/prisma.service';
+
+import { ISession } from 'src/global/interfaces';
+import { PrismaService } from 'src/global/modules/prisma/prisma.service';
+
 import { CreateWalletDto, FindQueryDto } from './dtos';
 
 @Injectable()

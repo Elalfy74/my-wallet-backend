@@ -1,14 +1,16 @@
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+
+import { Serialize } from 'src/global/interceptors';
+import { ISession } from 'src/global/interfaces';
+import { GetUser } from 'src/global/decorators';
+import { JwtAuthGuard } from 'src/global/guards';
+
 import { WalletsService } from './wallets.service';
-import { ISession } from 'src/auth/interfaces';
-import { JwtGuard } from 'src/guards';
-import { ApiTags } from '@nestjs/swagger';
 import { CreateWalletDto, FindQueryDto, WalletDto } from './dtos';
-import { Serialize } from 'src/interceptors';
-import { GetUser } from 'src/auth/decrators/get-user.decorator';
 
 @Controller('wallets')
-@UseGuards(JwtGuard)
+@UseGuards(JwtAuthGuard)
 @ApiTags('Wallets')
 export class WalletsController {
   constructor(private readonly walletsService: WalletsService) {}
@@ -22,6 +24,7 @@ export class WalletsController {
   }
 
   @Get('/one')
+  @ApiBearerAuth()
   @Serialize(WalletDto)
   findOne(@GetUser() user: ISession) {
     return this.walletsService.findOne(user);

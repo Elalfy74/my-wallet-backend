@@ -10,15 +10,16 @@ import {
 import { Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 
+import { Serialize } from 'src/global/interceptors';
+import { GetUser } from 'src/global/decorators/get-user.decorator';
+import { JwtAuthGuard } from 'src/global/guards';
+
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto, UserDto } from './dtos';
-import { Serialize } from 'src/interceptors';
-import { JwtGuard } from 'src/guards';
-import { GetUser } from './decrators/get-user.decorator';
+import { LoginDto, RegisterDto, AuthResponseDto } from './dtos';
 
 @Controller('auth')
 @ApiTags('Auth')
-@Serialize(UserDto)
+@Serialize(AuthResponseDto)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -29,13 +30,13 @@ export class AuthController {
   ) {
     const savedUser = await this.authService.register(registerDto);
 
-    response.cookie('token', savedUser.accessToken, {
+    response.cookie('refreshToken', savedUser.refreshToken, {
       sameSite: 'none',
       secure: true,
       httpOnly: true,
     });
 
-    return savedUser.user;
+    return savedUser;
   }
 
   @Post('login')
@@ -46,19 +47,19 @@ export class AuthController {
   ) {
     const user = await this.authService.login(loginDto);
 
-    response.cookie('token', user.accessToken, {
+    response.cookie('refreshToken', user.refreshToken, {
       sameSite: 'none',
       secure: true,
       httpOnly: true,
     });
 
-    return user.user;
+    return user;
   }
 
   @Post('logout')
   @HttpCode(200)
   logout(@Res({ passthrough: true }) response: Response) {
-    response.cookie('token', null, {
+    response.cookie('refreshToken', null, {
       sameSite: 'none',
       secure: true,
       httpOnly: true,
@@ -66,7 +67,7 @@ export class AuthController {
   }
 
   @Get('checkauth')
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtAuthGuard)
   getMe(@GetUser() user: { userId: string; email: string }) {
     return user;
   }

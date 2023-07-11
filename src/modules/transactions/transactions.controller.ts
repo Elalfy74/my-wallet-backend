@@ -1,20 +1,15 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  UseGuards,
-  Session,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
+import { ISession } from 'src/global/interfaces';
+import { JwtAuthGuard } from 'src/global/guards';
+import { GetUser } from 'src/global/decorators';
+
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dtos';
-import { JwtGuard } from 'src/guards';
-import { ISession } from 'src/auth/interfaces';
-import { ApiTags } from '@nestjs/swagger';
-import { GetUser } from 'src/auth/decrators/get-user.decorator';
 
 @Controller('transactions')
-@UseGuards(JwtGuard)
+@UseGuards(JwtAuthGuard)
 @ApiTags('Transactions')
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
