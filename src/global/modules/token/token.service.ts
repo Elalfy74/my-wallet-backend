@@ -8,7 +8,7 @@ import { ISession, JwtPayload } from '../../interfaces';
 export class TokenService {
   constructor(private jwt: JwtService, private config: ConfigService) {}
 
-  signToken(payload: ISession, type: 'access' | 'refresh') {
+  signToken(payload: ISession, type: 'access' | 'refresh' | 'reset') {
     const secret =
       type === 'access'
         ? this.config.get('JWT_SECRET')
@@ -24,6 +24,24 @@ export class TokenService {
       return this.jwt.sign(payload, {
         secret,
       });
+    }
+  }
+
+  signResetToken(payload: ISession, password: string) {
+    const secret = this.config.get('RESET_TOKEN') + password;
+
+    return this.jwt.sign(payload, {
+      secret,
+      expiresIn: +this.config.get('RESET_TTL'),
+    });
+  }
+
+  verifyResetToken(token: string, password: string) {
+    const secret = this.config.get('RESET_TOKEN') + password;
+    try {
+      return this.jwt.verify(token, { secret });
+    } catch (err) {
+      return false;
     }
   }
 
