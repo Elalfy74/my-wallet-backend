@@ -63,18 +63,26 @@ export class TransactionsService {
         name: true,
         sentTransactions: {
           select: {
+            id: true,
             amount: true,
             receiverName: true,
             createdAt: true,
             note: true,
           },
+          orderBy: {
+            createdAt: 'desc',
+          },
         },
         receivedTransactions: {
           select: {
+            id: true,
             amount: true,
             senderName: true,
             createdAt: true,
             note: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
           },
         },
       },
