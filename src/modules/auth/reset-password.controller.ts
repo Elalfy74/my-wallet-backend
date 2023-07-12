@@ -25,9 +25,9 @@ export class ResetPasswordController {
   @HttpCode(200)
   forgotPassword(
     @Body() forgotPasswordDto: ForgotPasswordDto,
-    @Headers('host') host: string,
+    @Headers('origin') origin: string,
   ) {
-    return this.resetPasswordService.forgotPassword(forgotPasswordDto, host);
+    return this.resetPasswordService.forgotPassword(forgotPasswordDto, origin);
   }
 
   @Get('reset-password/:userId/:token')

@@ -22,7 +22,7 @@ export class ResetPasswordService {
     private config: ConfigService,
   ) {}
 
-  async forgotPassword(forgotPasswordDto: ForgotPasswordDto, host: string) {
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto, origin: string) {
     const user = await this.prisma.user.findUnique({
       where: {
         email: forgotPasswordDto.email,
@@ -39,14 +39,17 @@ export class ResetPasswordService {
       user.password,
     );
 
-    const link = `${host}/${user.id}/${token}`;
+    const link = `${origin}/auth/reset-password/${user.id}/${token}`;
 
     const mail: MailDataRequired = {
       to: user.email,
       subject: 'Password Recovery Email',
       from: this.config.get('FROM_EMAIL'),
       text: 'Hello',
-      html: `<div><h1>Hello</h1><a href=${link}>Reset Password</div>`,
+      html: `<div>
+              <h1>Hello</h1>
+              <a href="${link}">Reset Password</a>
+            </div>`,
     };
 
     return this.sendGrid.send(mail);
@@ -63,7 +66,7 @@ export class ResetPasswordService {
     const payload = this.tokenService.verifyResetToken(token, user.password);
     if (!payload) throw new UnauthorizedException();
 
-    return payload;
+    return { message: 'valid' };
   }
 
   async resetPassword(
@@ -74,7 +77,7 @@ export class ResetPasswordService {
 
     const hashPassword = await hash(resetBody.password, 12);
 
-    return this.prisma.user.update({
+    await this.prisma.user.update({
       where: {
         id: resetParams.userId,
       },
@@ -82,5 +85,7 @@ export class ResetPasswordService {
         password: hashPassword,
       },
     });
+
+    return { message: 'Your password has been change successfully' };
   }
 }
