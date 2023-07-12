@@ -43,13 +43,11 @@ export class ResetPasswordService {
 
     const mail: MailDataRequired = {
       to: user.email,
-      subject: 'Password Recovery Email',
       from: this.config.get('FROM_EMAIL'),
-      text: 'Hello',
-      html: `<div>
-              <h1>Hello</h1>
-              <a href="${link}">Reset Password</a>
-            </div>`,
+      templateId: this.config.get('TEMPLATE_ID'),
+      dynamicTemplateData: {
+        link,
+      },
     };
 
     return this.sendGrid.send(mail);
